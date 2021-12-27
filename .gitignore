@@ -4,6 +4,7 @@ OLD/
 CSV/
 *.sqlite
 *.sqbpro
+*.sqlite-journal
 
 
 # Byte-compiled / optimized / DLL files
