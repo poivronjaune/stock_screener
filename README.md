@@ -2,7 +2,7 @@
 
 Work in progress (just fooling around with TSX Stocks data), no documentation for the moment.  
 Requires a local SQLite3 database with stock prices for TSX exchange.  
-Available historical data by year for some TSX symbols  
+Historical data by year for some TSX symbols provided in CSV files  
 
 Warning:  
 Bad code implementation, so no comments on code quality please.  
