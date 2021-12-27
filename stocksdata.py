@@ -3,7 +3,7 @@ import time
 import pandas as pd
 import sqlite3
 
-from datetime import datetime
+from datetime import date, datetime
 from dataclasses import dataclass, field
 
 @dataclass
@@ -108,9 +108,11 @@ class StocksData:
         if count:
             sql3 = "SELECT DISTINCT prices_daily.Ticker, symbols.name, min(prices_daily.Date) as start_date, max(prices_daily.Date) as end_date, count(prices_daily.Ticker) as price_rows FROM prices_daily INNER JOIN symbols ON prices_daily.Ticker = symbols.ticker GROUP BY prices_daily.ticker ORDER BY prices_daily.ticker"
             prices_data1 = pd.read_sql_query(sql3, conn)
+            prices_data1['Ticker'] = prices_data1['Ticker']
+            prices_data1['name'] = prices_data1['name']
             prices_data1['start_date'] = pd.to_datetime(prices_data1['start_date']).dt.date
             prices_data1['end_date'] = pd.to_datetime(prices_data1['end_date']).dt.date
-            prices_data1['price_rows'] = prices_data1['price_rows'].astype(int)
+            prices_data1['price_rows'] = prices_data1['price_rows'].astype('int32')
         else:
             d = datetime.today().strftime('%Y-%m-%d')
             empty_data = {
@@ -121,7 +123,8 @@ class StocksData:
                 "Price Rows" : 0
             }
             prices_data1 = pd.DataFrame(empty_data)
-
+        
+        conn.close()
         return prices_data1        
 
     def update_prices_daily(self, ticker, price_data):
@@ -147,4 +150,58 @@ class StocksData:
 
         print(f"\n\nUpdating 'prices_daily': {ticker} \n{price_data} \nExisting Prices\n{existing_prices_df} \nLast date: {last_date} \nNew Prices:\n{new_prices_df}")
 
+    def update_symbol(self, ticker, name, exchange):
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+        except Exception as e:
+            print(f"Unable to open connection to database, {e}")
+            return
+        
+        #print(f"Ready to insert {ticker}, {name}, {exchange}")
+        try:
+            sql = f"SELECT * FROM symbols WHERE ticker = '{ticker.upper()}'"
+            result = cursor.execute(sql).fetchone()
+        except Exception as e:
+            print(f"Unable to read from database, {e}")
+            conn.close()
+            return
+        
+        if result is None:
+            # Insert into database
+            print(f"Ready to INSERT {ticker}, {name}, {exchange}")
+            url = f"https://money.tmx.com/en/quote/{ticker}"
+            sql = f"INSERT INTO symbols (ticker, name, exchange, url, yahoo) VALUES ('{ticker.upper()}', '{name.upper()}', '{exchange}', '{url}', '-')" 
+            #sql = f"INSERT INTO symbols (ticker, name, exchange, url, yahoo) VALUES (?,?,?,?,?)"
+            cursor.execute(sql)
+            conn.commit()
+        else:
+            #url = f"https://money.tmx.com/en/quote/{ticker}"
+            print(f"Ready to UPDATE {ticker}, {name}, {exchange}")
+            sql = f"UPDATE symbols SET name='{name.upper()}', exchange='{exchange}' WHERE ticker = '{ticker.upper()}'"
+            cursor.execute(sql)
+            conn.commit()
+        
+        conn.close()
 
+    def get_symbols(self, filter=None):
+        """ Open symbols table and return a pandas dataframe of symbols, apply filter on ticker column if not None """
+        
+        # Open a connection to DB
+        conn = self.connect()
+        if conn is None:
+            return "Connection failed"
+
+        # Setup SQL request 
+        sql = f"SELECT * FROM symbols "
+        sql_filter = " "
+        sql_sort = "ORDER BY ticker ASC"
+        if filter is not None:
+            filter = f" WHERE ticker LIKE '{filter}%'"
+        
+        # Extract symbols data from database
+        symbols_df = pd.read_sql_query(sql+sql_filter+sql_sort, conn)
+        symbols_df.drop("index", axis=1, inplace=True)
+        conn.close()
+        return symbols_df
+        
