@@ -110,8 +110,8 @@ class StocksData:
             prices_data1 = pd.read_sql_query(sql3, conn)
             prices_data1['Ticker'] = prices_data1['Ticker']
             prices_data1['name'] = prices_data1['name']
-            prices_data1['start_date'] = pd.to_datetime(prices_data1['start_date']).dt.date
-            prices_data1['end_date'] = pd.to_datetime(prices_data1['end_date']).dt.date
+            prices_data1['start_date'] = pd.to_datetime(prices_data1['start_date'])
+            # prices_data1['end_date'] = pd.to_datetime(prices_data1['end_date'])
             prices_data1['price_rows'] = prices_data1['price_rows'].astype('int32')
         else:
             d = datetime.today().strftime('%Y-%m-%d')
