@@ -128,6 +128,7 @@ class StocksData:
         return prices_data1        
 
     def update_prices_daily(self, ticker, price_data):
+        """ Update prices_daily table from a dataframe. Use TMXScraper to extract data from the web """
         conn = self.connect()
         if conn is not None:
             symbol_to_load = ticker
