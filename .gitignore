@@ -5,7 +5,7 @@ CSV/
 *.sqlite
 *.sqbpro
 *.sqlite-journal
-
+ChromeProfile/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

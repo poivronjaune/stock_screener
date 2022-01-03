@@ -128,27 +128,35 @@ class StocksData:
         return prices_data1        
 
     def update_prices_daily(self, ticker, price_data):
+        """ Update prices_daily table from a dataframe. Use TMXScraper to extract data from the web """
         conn = self.connect()
         if conn is not None:
             symbol_to_load = ticker
             existing_prices_df = pd.read_sql(f"SELECT * FROM 'prices_daily' WHERE Ticker='{symbol_to_load}' ORDER BY Date DESC LIMIT 1", conn)
+        else:
+            return
 
         try:
             last_date = existing_prices_df.loc[0]["Date"]
+            # Make sure price_data that was passed in, is greater than the last date we have in our database
             new_prices_df = price_data.loc[price_data["Date"] > last_date]
         except KeyError:
             last_date = None
             new_prices_df = price_data
 
-        # Structure the data according to database table structure
-        new_prices_df.drop(['VWAP ($)', 'Change ($)', 'Trade Value', '# Trades', 'Change (%)'], axis=1, inplace=True)
-        new_prices_df.rename(columns={'Open ($)': 'Open', 'High ($)': 'High', 'Low ($)': 'Low', 'Close ($)': 'Close'  }, inplace=True)
-        new_prices_df["Ticker"] = symbol_to_load
-        #new_prices_df['Date'] = pd.to_datetime(data_cleaned["Date"], infer_datetime_format=True)
-        new_prices_df = new_prices_df.reindex(["Date","Ticker","Open","High","Low","Close","Volume"],axis=1)
-        new_prices_df.to_sql("prices_daily", conn, if_exists="append")
+        if new_prices_df is not None:
+            # Structure the data according to database table structure
+            new_prices_df.drop(['VWAP ($)', 'Change ($)', 'Trade Value', '# Trades', 'Change (%)'], axis=1, inplace=True)
+            new_prices_df.rename(columns={'Open ($)': 'Open', 'High ($)': 'High', 'Low ($)': 'Low', 'Close ($)': 'Close'  }, inplace=True)
+            new_prices_df["Ticker"] = symbol_to_load
+            new_prices_df["Date"] = pd.to_datetime(new_prices_df["Date"], infer_datetime_format=True)
+            #new_prices_df['Date'] = pd.to_datetime(data_cleaned["Date"], infer_datetime_format=True)
+            new_prices_df = new_prices_df.reindex(["Date","Ticker","Open","High","Low","Close","Volume"],axis=1)
+            new_prices_df.to_sql("prices_daily", conn, if_exists="append")
 
-        print(f"\n\nUpdating 'prices_daily': {ticker} \n{price_data} \nExisting Prices\n{existing_prices_df} \nLast date: {last_date} \nNew Prices:\n{new_prices_df}")
+            print(f"\n\nUpdating 'prices_daily': {ticker} \n{price_data} \nExisting Prices\n{existing_prices_df} \nLast date: {last_date} \nNew Prices:\n{new_prices_df}")
+        else:
+            return
 
     def update_symbol(self, ticker, name, exchange):
         try:

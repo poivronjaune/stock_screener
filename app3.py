@@ -1,4 +1,5 @@
 # Color references : https://www.tcl.tk/man/tcl/TkCmd/colors.html
+# TODO: Implement Multi-Browser support (until then use the Jupyter for multibrowser scrapping)
 
 import time
 from typing import Text

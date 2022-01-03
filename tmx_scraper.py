@@ -1,5 +1,7 @@
+import os
 import time
 import warnings
+import random
 from numpy import result_type
 
 import pandas as pd
@@ -13,10 +15,32 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+def multi_browser_scrap(tickers, browser_qty):
+    drivers = []
+    data = []
+
+    # Open Browsers
+    for id in range(0,browser_qty):
+        drivers.append(TMXScraper(ID=id))
+        data.append(None)
+    
+    # Loop through tickers
+    ticker_index = 0
+    while ticker_index < len(tickers):        
+        for id in range(0,browser_qty):
+            ticker_offset = ticker_index + id
+            if ticker_offset < len(tickers):
+                drivers[id].open_page(tickers[ticker_offset])
+                data[id] = drivers[id].scrap_data_from_page()
+                data[id].to_csv(f"CSV\{tickers[ticker_offset]}.csv", mode='w', header=True)
+        
+        ticker_index = ticker_index + browser_qty
+
 class TMXScraper:
-    def __init__(self) -> None:
+    def __init__(self, ID=1, headless=False) -> None:
         self.driver = None
         self.wait = None
+        self.id = ID
 
         self.open_browser() # Creates driver and wait objects for selenium
 
@@ -49,12 +73,14 @@ class TMXScraper:
         """ Create a selenium driver object name self.driver. Create a default WebDriverWait object """
         # Setup Selenium browser
         CHROME_DRIVER_LOCATION = "chromedriver.exe"
+        self.full_path = os.path.abspath(".\ChromeProfile")
         service_object = Service(CHROME_DRIVER_LOCATION)
 
         OPTIONS = webdriver.ChromeOptions()
         OPTIONS.add_argument('--ignore-certicate-errors')
         OPTIONS.add_argument('--incognito')
         #OPTIONS.add_argument('--headless')
+        OPTIONS.add_argument(f'--user-data-dir={self.full_path}\Profile{self.id}')
         OPTIONS.add_experimental_option('excludeSwitches', ['enable-logging'])
        
         #self.driver = webdriver.Chrome(executable_path=CHROME_DRIVER_LOCATION,options=OPTIONS)
@@ -70,7 +96,9 @@ class TMXScraper:
         tmx_url = f"https://money.tmx.com/en/quote/{symbol}/trade-history?selectedTab=price-history"
         try:
             self.driver.get(tmx_url)
-            time.sleep(5)
+            # random_delay = random.randint(3, 9)
+            # print(f"Random sleep delay : {random_delay}")
+            # time.sleep(random_delay)
             ad_closed = self.close_add()
             return True
         except Exception as e:
@@ -189,8 +217,12 @@ class TMXScraper:
 
 if __name__ == "__main__":
     print("Testing tmx_scraper functions")
-    scraper = TMXScraper()
+    #scraper = TMXScraper()
     #result = scraper.scrap_one_page("ABCT")
-    result = scraper.scrap_symbols("A", "tsxv")
-    print(result)
+    #result = scraper.scrap_symbols("A", "tsxv")
+    #print(result)
     #scraper.close()
+
+
+    multi_browser_scrap(["ABCT", "ABR", "LWRK", "HDGE", "DRX", "ACO.Y", "HSH"], 3)
+
