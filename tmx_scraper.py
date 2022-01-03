@@ -1,5 +1,7 @@
+import os
 import time
 import warnings
+import random
 from numpy import result_type
 
 import pandas as pd
@@ -14,9 +16,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class TMXScraper:
-    def __init__(self) -> None:
+    def __init__(self, ID=1) -> None:
         self.driver = None
         self.wait = None
+        self.id = ID
 
         self.open_browser() # Creates driver and wait objects for selenium
 
@@ -49,12 +52,14 @@ class TMXScraper:
         """ Create a selenium driver object name self.driver. Create a default WebDriverWait object """
         # Setup Selenium browser
         CHROME_DRIVER_LOCATION = "chromedriver.exe"
+        self.full_path = os.path.abspath(".\ChromeProfile")
         service_object = Service(CHROME_DRIVER_LOCATION)
 
         OPTIONS = webdriver.ChromeOptions()
         OPTIONS.add_argument('--ignore-certicate-errors')
         OPTIONS.add_argument('--incognito')
         #OPTIONS.add_argument('--headless')
+        OPTIONS.add_argument(f'--user-data-dir={self.full_path}\Profile{self.id}')
         OPTIONS.add_experimental_option('excludeSwitches', ['enable-logging'])
        
         #self.driver = webdriver.Chrome(executable_path=CHROME_DRIVER_LOCATION,options=OPTIONS)
@@ -70,7 +75,9 @@ class TMXScraper:
         tmx_url = f"https://money.tmx.com/en/quote/{symbol}/trade-history?selectedTab=price-history"
         try:
             self.driver.get(tmx_url)
-            time.sleep(5)
+            random_delay = random.randint(3, 9)
+            print(f"Random sleep delay : {random_delay}")
+            time.sleep(random_delay)
             ad_closed = self.close_add()
             return True
         except Exception as e:
