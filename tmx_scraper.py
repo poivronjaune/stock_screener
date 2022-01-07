@@ -96,7 +96,7 @@ class TMXScraper:
         tmx_url = f"https://money.tmx.com/en/quote/{symbol}/trade-history?selectedTab=price-history"
         try:
             self.driver.get(tmx_url)
-            random_delay = random.randint(3, 9)
+            random_delay = random.randint(2, 6)
             print(f"Random sleep delay : {random_delay}")
             time.sleep(random_delay)
             ad_closed = self.close_add()
