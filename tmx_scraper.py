@@ -169,7 +169,8 @@ class TMXScraper:
             pass
         return True
 
-    def extract_html_table(self):
+
+def extract_html_table(self):
         """ Extract the price data from HTML using Pandad read_html method """
         d = datetime.today().strftime('%Y-%m-%d')
         empty_data = {
@@ -195,7 +196,7 @@ class TMXScraper:
 
         prices_df['Date'] = pd.to_datetime(prices_df["Date"], infer_datetime_format=True)
 
-        return prices_df
+        return prices_df        
 
     def extract_symbols_from_html_table(self, datagrid):
         """ Extract symbols and company info from HTML table. Pandas read_HTML does not work on this page """
@@ -224,5 +225,5 @@ if __name__ == "__main__":
     #scraper.close()
 
 
-    multi_browser_scrap(["ABCT", "ABR", "LWRK", "HDGE", "DRX", "ACO.Y", "HSH"], 3)
+    #multi_browser_scrap(["ABCT", "ABR", "LWRK", "HDGE", "DRX", "ACO.Y", "HSH"], 3)
 
