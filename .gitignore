@@ -2,6 +2,7 @@
 IGNORE/
 OLD/
 CSV/
+TSXCSV/
 *.sqlite
 *.sqbpro
 *.sqlite-journal
