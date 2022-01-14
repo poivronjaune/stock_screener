@@ -170,7 +170,7 @@ class TMXScraper:
         return True
 
 
-def extract_html_table(self):
+    def extract_html_table(self):
         """ Extract the price data from HTML using Pandad read_html method """
         d = datetime.today().strftime('%Y-%m-%d')
         empty_data = {
