@@ -7,7 +7,6 @@ TSXCSV/
 *.sqbpro
 *.sqlite-journal
 ChromeProfile/
-*.whl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
