@@ -1,18 +1,20 @@
-# TSX Stock Screener
+# TSX Stock Screener and Indicators
 
 Work in progress (just fooling around with TSX Stocks data), no documentation for the moment.  
 Requires a local SQLite3 database with stock prices for TSX exchange.  
-Historical data by year for some TSX symbols provided in CSV files  
+Historical data by year for many TSX symbols provided in CSV files  
 
 Warning:  
 Bad code implementation, so no comments on code quality please.  
 
+#### Solution components  
+![Solution](/images/ComponentsArchitecture.PNG)
 
-### SQL Lite 3 data base schema  
+## Building the local database  
+
 For those who want to rebuild the prices database. Try to use the first 2 cells of the jupyter notebook. Use at your own risk.
 
 #### prices_daily
-- index   : integer
 - Date    : text
 - Ticker  : text
 - Open    : real
@@ -22,9 +24,7 @@ For those who want to rebuild the prices database. Try to use the first 2 cells 
 - Volume  : real
 
 #### Symbols
-- index   : integer
 - ticker  : text
 - name    : text
 - exchange: text
-- url     : text
-- yahoo   : text
+
