@@ -36,3 +36,5 @@ A global variable ``database_name`` is used for all function expect the create D
 - name    : text
 - exchange: text
 
+## Selenium requirements
+https://chromedriver.chromium.org/downloads

@@ -187,7 +187,7 @@ def cmd_update_prices():
             trv1.see(trv1_row_selected)
             root.update()
             ticker = row_data[0]
-            df_prices_from_html = tmx_scraper.scrap_pages(ticker, pages=1)
+            df_prices_from_html = tmx_scraper.scrap_pages(ticker, pages=3)
             stocks_data.update_prices_daily(ticker, df_prices_from_html)
         tmx_scraper.close()
 
